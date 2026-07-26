@@ -31,7 +31,7 @@ async function fetchCountryData(countryName, isoCode) {
     params.append('countryName', countryName);
   }
 
-  const response = await fetch(`/api/country?${params.toString()}`);
+  const response = await fetch(`/api/countries?${params.toString()}`);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -59,7 +59,7 @@ async function fetchCountryData(countryName, isoCode) {
       <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(name)}" target="_blank" rel="noopener" style="display: inline-block; margin-top: 8px; font-size: 0.9em;">More info →</a>
     </div>
   `;
-}
+} 
 
 // Fetch and display country outlines
 fetch(geoJsonUrl)

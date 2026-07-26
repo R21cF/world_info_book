@@ -1,46 +1,55 @@
-// file: pages/api/country.js
+// file: api/countries.js
 export default async function handler(req, res) {
-  // 1. Get parameters from the frontend
+  console.log('📥 Request received:', req.query);
+
   const { isoCode, countryName } = req.query;
 
-  // 2. Validate input
   if (!isoCode && !countryName) {
     return res.status(400).json({ error: 'Missing isoCode or countryName' });
   }
 
-  // 3. Read the secret key from environment variables (Server-side only!)
+  // Log the environment variable to see if it's loaded
   const API_KEY = process.env.REST_COUNTRIES_KEY;
+  console.log('🔑 API_KEY present?', !!API_KEY);
+  console.log('🔑 API_KEY value (first 4 chars):', API_KEY ? API_KEY.slice(0, 4) : 'undefined');
+
   if (!API_KEY) {
-    console.error('REST_COUNTRIES_KEY is not set');
-    return res.status(500).json({ error: 'Server configuration error' });
+    console.error('❌ REST_COUNTRIES_KEY is not set');
+    return res.status(500).json({ error: 'Server configuration error: missing API key' });
   }
 
-  // 4. Build the correct v5 URL
   let url;
   if (isoCode && isoCode !== '-99') {
     url = `https://api.restcountries.com/countries/v5/codes.alpha_3/${isoCode}`;
   } else {
     url = `https://api.restcountries.com/countries/v5/names.common/${encodeURIComponent(countryName)}?fullText=true`;
   }
+  console.log('🌐 Fetching URL:', url);
 
   try {
-    // 5. Fetch from the real API with the secret key (hidden from the browser)
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${API_KEY}`
       }
     });
 
+    console.log('📡 External API status:', response.status);
+
     if (!response.ok) {
-      throw new Error(`API responded with status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ External API error:', response.status, errorText);
+      return res.status(response.status).json({
+        error: `External API error: ${response.status}`,
+        details: errorText
+      });
     }
 
     const data = await response.json();
+    console.log('✅ Data received, objects count:', data.data?.objects?.length || 0);
 
-    // 6. Return the data to the frontend
     res.status(200).json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
-    res.status(500).json({ error: 'Failed to fetch country data' });
+    console.error('💥 Proxy error:', error.message);
+    res.status(500).json({ error: `Failed to fetch country data: ${error.message}` });
   }
 }
