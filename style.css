@@ -26,3 +26,35 @@ body {
   white-space: pre-wrap;  /* Respects newlines and wraps text */
   word-break: break-word;
 }
+
+/* ===== App Title (Top-Left Badge) ===== */
+#app-title {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  padding: 10px 20px;
+  border-radius: 40px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  pointer-events: none; /* clicks pass through to the map */
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  #app-title {
+    top: 14px;
+    left: 14px;
+    padding: 6px 14px;
+    font-size: 1rem;
+  }
+}

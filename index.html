@@ -15,12 +15,11 @@
   </head>
   <body>
     <div id="map"></div>
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
-    <script defer src="script.js"></script>
+    <!-- App Title (Top-Left Badge) -->
+    <div id="app-title">
+      🌍 World Info Book
+    </div>
+
 
     <!-- Floating chat button -->
     <button id="chat-toggle" style="position:fixed; bottom:20px; right:20px; 
@@ -52,6 +51,13 @@
         </button>
       </div>
     </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script defer src="script.js"></script>
 
     <script>
       // Chat functionality
