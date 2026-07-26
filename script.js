@@ -21,7 +21,7 @@ function formatPopulation(pop) {
   return pop.toLocaleString('en-US');
 }
 
-// Helper: fetch country data and return HTML string for popup
+
 // Helper: fetch country data via our secure backend proxy
 async function fetchCountryData(countryName, isoCode) {
   const params = new URLSearchParams();
@@ -39,7 +39,12 @@ async function fetchCountryData(countryName, isoCode) {
   }
 
   const rawData = await response.json();
-  // v5 response: { data: { objects: [...] } }
+
+  // SAFETY: Ensure we have an array of objects
+  if (!rawData.data?.objects || rawData.data.objects.length === 0) {
+    throw new Error('No country data found for ' + countryName);
+  }
+
   const country = rawData.data.objects[0];
 
   // Extract fields with safe fallbacks
@@ -56,10 +61,10 @@ async function fetchCountryData(countryName, isoCode) {
       <p style="margin: 4px 0;"><strong>Capital:</strong> ${capital}</p>
       <p style="margin: 4px 0;"><strong>Continent:</strong> ${continent}</p>
       <p style="margin: 4px 0;"><strong>Population:</strong> ${formatPopulation(population)}</p>
-      <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(name)}" target="_blank" rel="noopener" style="display: inline-block; margin-top: 8px; font-size: 0.9em;">More info →</a>
+      <a href="https://www.britannica.com/search?query=${encodeURIComponent(name)}" target="_blank" rel="noopener" style="display: inline-block; margin-top: 8px; font-size: 0.9em;">More info →</a>
     </div>
   `;
-} 
+}
 
 // Fetch and display country outlines
 fetch(geoJsonUrl)
@@ -97,8 +102,13 @@ fetch(geoJsonUrl)
               popup.setContent(html);
             })
             .catch(err => {
-              console.error('Error fetching country:', err);
-              popup.setContent(`<div style="padding: 8px;">Could not load data for <strong>${countryName}</strong>.</div>`);
+            console.error('Error fetching country:', err);
+            popup.setContent(`
+                <div style="padding: 8px; color: #c0392b;">
+                Could not load data for <strong>${countryName}</strong>.<br>
+                <small style="color: #555;">${err.message}</small>
+                </div>
+            `);
             });
         });
       }

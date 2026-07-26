@@ -19,8 +19,15 @@ export default async function handler(req, res) {
   }
 
   let url;
-  if (isoCode && isoCode !== '-99') {
-    url = `https://api.restcountries.com/countries/v5/codes.alpha_3/${isoCode}`;
+  let codeToUse = isoCode;
+  
+  // Special case: USA alpha-3 doesn't work, use alpha-2 instead
+  if (isoCode === 'USA') {
+    codeToUse = 'US';
+  }
+  
+  if (codeToUse && codeToUse !== '-99') {
+    url = `https://api.restcountries.com/countries/v5/codes.alpha_3/${codeToUse}`;
   } else {
     url = `https://api.restcountries.com/countries/v5/names.common/${encodeURIComponent(countryName)}?fullText=true`;
   }
