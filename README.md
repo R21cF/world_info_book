@@ -2,7 +2,7 @@
 
 An interactive, AI‑powered world map that lets you explore country data at a glance – and ask questions about any country.
 
-![Screenshot](![world-info-book](image.png))
+![world-info-book](image.png)
 
 ---
 
@@ -71,6 +71,12 @@ You are a helpful country facts assistant. Respond in clear, plain text. Do not 
 | **Version Control** | Git + GitHub |
 
 ---
+
+## 📸 The App in Action
+
+![Basic display for a country](image-1.png)
+
+![AI chatbot in use](image-2.png)
 
 ## 🏁 How to Run the Project
 
