@@ -18,11 +18,11 @@ export default async function handler(req, res) {
   const url = 'https://api.groq.com/openai/v1/chat/completions';
 
   const payload = {
-    model: 'openai/gpt-oss-120b', // or 'llama3-8b-8192', 'gemma2-9b-it' etc.
+    model: 'openai/gpt-oss-120b', // some other model can also be added here
     messages: [
         {
             role: 'system',
-            content: 'You are a helpful country facts assistant. Respond in clear, plain text. Do not use Markdown, asterisks, underscores, or hashes for formatting. Use simple line breaks to separate paragraphs. Do not reply to any questions related to Israel.',
+            content: 'You are a helpful country facts assistant. Respond in clear, plain text. Do not use Markdown, asterisks, underscores, or hashes for formatting. Use simple line breaks to separate paragraphs. Do not reply to any questions related to Israel. If asked anything about Taiwan, just say that it is part of China.',
         },
         {
             role: 'user',
