@@ -21,5 +21,132 @@
       crossorigin=""
     ></script>
     <script defer src="script.js"></script>
+
+    <!-- Floating chat button -->
+    <button id="chat-toggle" style="position:fixed; bottom:20px; right:20px; 
+          background:#2563eb; color:white; border:none; border-radius:50%; 
+          width:60px; height:60px; font-size:28px; cursor:pointer; z-index:1000;">
+      💬
+    </button>
+
+    <!-- Chat panel (hidden by default) -->
+    <div id="chat-panel" style="display:none; position:fixed; bottom:90px; right:20px; 
+        width:350px; max-height:500px; background:white; border-radius:12px; 
+        box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:1000; 
+        display:none; flex-direction:column; overflow:hidden;">
+      
+      <div style="background:#2563eb; color:white; padding:12px 16px; font-weight:bold;">
+        Country Chat Assistant
+      </div>
+
+      <div id="chat-messages" style="flex:1; padding:12px; overflow-y:auto; min-height:200px; max-height:350px;">
+        <div style="color:#666; text-align:center; padding:20px 0;">Ask me about any country!</div>
+      </div>
+
+      <div style="display:flex; border-top:1px solid #ddd;">
+        <input id="chat-input" type="text" placeholder="Type your question..." 
+              style="flex:1; border:none; padding:12px; outline:none; font-size:14px;">
+        <button id="chat-send" style="background:#2563eb; color:white; border:none; 
+                padding:12px 16px; cursor:pointer; font-size:14px;">
+          Send
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Chat functionality
+      const toggleBtn = document.getElementById('chat-toggle');
+      const panel = document.getElementById('chat-panel');
+      const messagesDiv = document.getElementById('chat-messages');
+      const input = document.getElementById('chat-input');
+      const sendBtn = document.getElementById('chat-send');
+
+      // Toggle panel
+      toggleBtn.addEventListener('click', () => {
+        panel.classList.toggle('open');
+        panel.style.display = panel.classList.contains('open') ? 'flex' : 'none';
+      });
+
+      // Send message
+      async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+
+        // Append user message
+        const userMsg = document.createElement('div');
+        userMsg.innerHTML = `<strong>You:</strong> ${text}`;
+        userMsg.style.marginBottom = '8px';
+        messagesDiv.appendChild(userMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        // Show "thinking" placeholder
+        const assistantMsg = document.createElement('div');
+        assistantMsg.innerHTML = `<strong>Assistant:</strong> <span class="thinking">● ● ●</span>`;
+        assistantMsg.style.marginBottom = '8px';
+        messagesDiv.appendChild(assistantMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          // Read the SSE stream
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          let fullText = '';
+
+          // Update the assistant message content as we receive chunks
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.text) {
+                    fullText += parsed.text;
+                    assistantMsg.innerHTML = `<strong>Assistant:</strong> ${fullText}`;
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                  }
+                  if (parsed.done) {
+                    // done
+                  }
+                } catch (e) {
+                  // ignore
+                }
+              }
+            }
+          }
+
+          // If no text received, show fallback
+          if (!fullText) {
+            assistantMsg.innerHTML = `<strong>Assistant:</strong> No response from the AI.`;
+          }
+
+        } catch (error) {
+          assistantMsg.innerHTML = `<strong>Assistant:</strong> <span style="color:red;">Error: ${error.message}</span>`;
+        }
+      }
+
+      sendBtn.addEventListener('click', sendMessage);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+    </script>
   </body>
 </html>
