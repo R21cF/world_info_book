@@ -2,7 +2,7 @@
 
 An interactive, AI‑powered world map that lets you explore country data at a glance – and ask questions about any country.
 
-![Screenshot](https://via.placeholder.com/800x400?text=World+Info+Book+Screenshot) *(Add your own screenshot here)*
+![Screenshot](![world-info-book](image.png))
 
 ---
 
