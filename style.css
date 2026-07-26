@@ -14,3 +14,15 @@ body {
   height: 100%;
   width: 100%;
 }
+
+#chat-panel {
+  display: none; /* hidden by default, toggled via JS */
+}
+#chat-panel.open {
+  display: flex;
+}
+
+#chat-messages .message-text {
+  white-space: pre-wrap;  /* Respects newlines and wraps text */
+  word-break: break-word;
+}
