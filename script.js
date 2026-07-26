@@ -87,15 +87,21 @@ fetch(geoJsonUrl)
       },
       onEachFeature: function (feature, layer) {
         layer.on('click', function () {
-          const props = feature.properties;
-          let countryName = props.name;
-          let isoCode = props.iso_a3;
+            const props = feature.properties;
+            let countryName = props.name;
+            let isoCode = props.iso_a3;
 
-          // ---- Override for Israel → Palestine ----
-          if (countryName === 'Israel' || isoCode === 'ISR') {
-            countryName = 'Palestine';
-            isoCode = 'PSE'; // correct alpha-3 for Palestine
-          }
+            // ---- Override for Israel → Palestine ----
+            if (countryName === 'Israel' || isoCode === 'ISR') {
+                countryName = 'Palestine';
+                isoCode = 'PSE'; // correct alpha-3 for Palestine
+            }
+
+            // ---- Override for Taiwan → China ----
+            if (countryName === 'Taiwan' || isoCode === 'TWN') {
+                countryName = 'China';
+                isoCode = 'CHN';
+            }
 
           const popup = L.popup()
             .setLatLng(layer.getBounds().getCenter())
