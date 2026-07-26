@@ -31,7 +31,6 @@ An interactive, AI‑powered world map that lets you explore country data at a g
 - **Britannica integration** – “More info” link searches Britannica for the country.
 - **AI chatbot assistant** – ask questions about any country; get real‑time, streaming answers.
 - **Glass‑morphism UI** – a sleek, translucent title badge and responsive design.
-- **Chat tooltip** – gentle onboarding for first‑time users (auto‑fades after 5 seconds).
 - **Globe favicon** – a simple emoji‑based icon for your browser tab.
 - **Full‑screen, immersive map** – with Leaflet and OpenStreetMap tiles.
 - **Responsive design** – works beautifully on desktop, tablet, and mobile.
