@@ -22,31 +22,36 @@ function formatPopulation(pop) {
 }
 
 // Helper: fetch country data and return HTML string for popup
+// Helper: fetch country data via our secure backend proxy
 async function fetchCountryData(countryName, isoCode) {
-  let url;
+  const params = new URLSearchParams();
   if (isoCode && isoCode !== '-99') {
-    url = `https://restcountries.com/v3.1/alpha/${isoCode}`;
+    params.append('isoCode', isoCode);
   } else {
-    url = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}?fullText=true`;
+    params.append('countryName', countryName);
   }
 
-  const response = await fetch(url);
+  const response = await fetch(`/api/country?${params.toString()}`);
+
   if (!response.ok) {
-    throw new Error('Country not found');
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP ${response.status}`);
   }
-  const data = await response.json();
-  // The API returns an array; we take the first result
-  const country = data[0];
 
-  const name = country.name.common;
-  const capital = country.capital ? country.capital[0] : 'N/A';
-  const continent = country.region; // API doesn't have 'continent' directly; 'region' is broad (e.g., Europe, Asia)
-  const population = country.population;
-  const flagUrl = country.flags.png;
+  const rawData = await response.json();
+  // v5 response: { data: { objects: [...] } }
+  const country = rawData.data.objects[0];
+
+  // Extract fields with safe fallbacks
+  const name = country.names?.common || countryName;
+  const capital = country.capitals?.[0]?.name || 'N/A';
+  const continent = country.continents?.[0] || country.region || 'N/A';
+  const population = country.population ?? 0;
+  const flagUrl = country.flag?.url_png || country.flag?.url_svg || '';
 
   return `
     <div style="min-width: 150px; text-align: center;">
-      <img src="${flagUrl}" alt="Flag" style="width: 80px; height: auto; margin-bottom: 8px; border: 1px solid #ccc;" />
+      ${flagUrl ? `<img src="${flagUrl}" alt="Flag" style="width: 80px; height: auto; margin-bottom: 8px; border: 1px solid #ccc;" />` : ''}
       <h3 style="margin: 4px 0;">${name}</h3>
       <p style="margin: 4px 0;"><strong>Capital:</strong> ${capital}</p>
       <p style="margin: 4px 0;"><strong>Continent:</strong> ${continent}</p>
