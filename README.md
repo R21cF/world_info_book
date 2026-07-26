@@ -75,8 +75,13 @@ You are a helpful country facts assistant. Respond in clear, plain text. Do not 
 ## 📸 The App in Action
 
 ![Basic display for a country](image-1.png)
+*Information popup for a country*
 
 ![AI chatbot in use](image-2.png)
+*Using the chatbot integration*
+
+![Display on mobile](image-3.png)
+*The app on mobile displays*
 
 ## 🏁 How to Run the Project
 
