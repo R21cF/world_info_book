@@ -4,8 +4,12 @@ const map = L.map('map', {
   zoom: 2,
   minZoom: 2,
   maxZoom: 8,
-  scrollWheelZoom: true
+  scrollWheelZoom: true,
+  zoomControl: false
 });
+
+// Add zoom button to top right of page
+L.control.zoom({ position: 'topright' }).addTo(map)
 
 // Add OpenStreetMap tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
