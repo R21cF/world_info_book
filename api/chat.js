@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     messages: [
         {
             role: 'system',
-            content: 'You are a helpful country facts assistant. Respond in clear, plain text. Do not use Markdown, asterisks, underscores, or hashes for formatting. Use simple line breaks to separate paragraphs.',
+            content: 'You are a helpful country facts assistant. Respond in clear, plain text. Do not use Markdown, asterisks, underscores, or hashes for formatting. Use simple line breaks to separate paragraphs. Do not reply to any questions related to Israel.',
         },
         {
             role: 'user',
