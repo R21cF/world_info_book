@@ -21,7 +21,6 @@ function formatPopulation(pop) {
   return pop.toLocaleString('en-US');
 }
 
-
 // Helper: fetch country data via our secure backend proxy
 async function fetchCountryData(countryName, isoCode) {
   const params = new URLSearchParams();
@@ -40,14 +39,12 @@ async function fetchCountryData(countryName, isoCode) {
 
   const rawData = await response.json();
 
-  // SAFETY: Ensure we have an array of objects
   if (!rawData.data?.objects || rawData.data.objects.length === 0) {
     throw new Error('No country data found for ' + countryName);
   }
 
   const country = rawData.data.objects[0];
 
-  // Extract fields with safe fallbacks
   const name = country.names?.common || countryName;
   const capital = country.capitals?.[0]?.name || 'N/A';
   const continent = country.continents?.[0] || country.region || 'N/A';
@@ -87,28 +84,32 @@ fetch(geoJsonUrl)
       onEachFeature: function (feature, layer) {
         layer.on('click', function () {
           const props = feature.properties;
-          const countryName = props.name;
-          const isoCode = props.iso_a3;
+          let countryName = props.name;
+          let isoCode = props.iso_a3;
 
-          // Immediately show loading state
+          // ---- Override for Israel → Palestine ----
+          if (countryName === 'Israel' || isoCode === 'ISR') {
+            countryName = 'Palestine';
+            isoCode = 'PSE'; // correct alpha-3 for Palestine
+          }
+
           const popup = L.popup()
             .setLatLng(layer.getBounds().getCenter())
             .setContent('<div style="padding: 8px;">Loading...</div>')
             .openOn(map);
 
-          // Fetch live data and update popup
           fetchCountryData(countryName, isoCode)
             .then(html => {
               popup.setContent(html);
             })
             .catch(err => {
-            console.error('Error fetching country:', err);
-            popup.setContent(`
+              console.error('Error fetching country:', err);
+              popup.setContent(`
                 <div style="padding: 8px; color: #c0392b;">
-                Could not load data for <strong>${countryName}</strong>.<br>
-                <small style="color: #555;">${err.message}</small>
+                  Could not load data for <strong>${countryName}</strong>.<br>
+                  <small style="color: #555;">${err.message}</small>
                 </div>
-            `);
+              `);
             });
         });
       }
