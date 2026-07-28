@@ -145,7 +145,7 @@ world-info-book/
 │   ├── chat.js         # AI chatbot endpoint (Groq)
 │   └── countries.js    # Country data proxy (REST Countries v5)
 ├── .env                # Environment variables (ignored by Git)
-├── .env.local          # Ignored by git as well
+├── .env.local          # Ignored by Git as well
 └── .gitignore          # For telling Git to ignore files
 ```
 
