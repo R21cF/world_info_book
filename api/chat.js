@@ -8,6 +8,9 @@ export default async function handler(req, res) {
   if (!message || typeof message !== 'string') {
     return res.status(400).json({ error: 'Missing or invalid message' });
   }
+  if (message.length > 2000) {
+    return res.status(400).json({ error: 'Message too long (max 2000 characters)' });
+  }
 
   const API_KEY = process.env.GROQ_API_KEY;
   if (!API_KEY) {

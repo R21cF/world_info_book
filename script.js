@@ -25,6 +25,13 @@ function formatPopulation(pop) {
   return pop.toLocaleString('en-US');
 }
 
+// Helper: escape text before interpolating into innerHTML
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Helper: fetch country data via our secure backend proxy
 async function fetchCountryData(countryName, isoCode) {
   const params = new URLSearchParams();
@@ -49,15 +56,15 @@ async function fetchCountryData(countryName, isoCode) {
 
   const country = rawData.data.objects[0];
 
-  const name = country.names?.common || countryName;
-  const capital = country.capitals?.[0]?.name || 'N/A';
-  const continent = country.continents?.[0] || country.region || 'N/A';
+  const name = escapeHtml(country.names?.common || countryName);
+  const capital = escapeHtml(country.capitals?.[0]?.name || 'N/A');
+  const continent = escapeHtml(country.continents?.[0] || country.region || 'N/A');
   const population = country.population ?? 0;
   const flagUrl = country.flag?.url_png || country.flag?.url_svg || '';
 
   return `
     <div style="min-width: 150px; text-align: center;">
-      ${flagUrl ? `<img src="${flagUrl}" alt="Flag" style="width: 80px; height: auto; margin-bottom: 8px; border: 1px solid #ccc;" />` : ''}
+      ${flagUrl ? `<img src="${escapeHtml(flagUrl)}" alt="Flag" style="width: 80px; height: auto; margin-bottom: 8px; border: 1px solid #ccc;" />` : ''}
       <h3 style="margin: 4px 0;">${name}</h3>
       <p style="margin: 4px 0;"><strong>Capital:</strong> ${capital}</p>
       <p style="margin: 4px 0;"><strong>Continent:</strong> ${continent}</p>
