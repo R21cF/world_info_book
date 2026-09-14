@@ -13,6 +13,103 @@ body {
 #map {
   height: 100%;
   width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #aad3df;
+}
+
+#map-svg {
+  display: block;
+  cursor: grab;
+  /* Let d3-zoom own pinch/drag gestures instead of the browser's native
+     page-zoom/scroll, which would otherwise fight it on touch devices. */
+  touch-action: none;
+}
+
+#map-svg:active {
+  cursor: grabbing;
+}
+
+.ocean {
+  fill: #aad3df;
+}
+
+.country {
+  fill: #ecf0f1;
+  stroke: #2c3e50;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke; /* keep border thickness constant while zooming */
+  cursor: pointer;
+  transition: fill 0.15s ease;
+}
+
+.country:hover {
+  fill: #cfd8dc;
+}
+
+/* ===== Map zoom controls (top-right) ===== */
+#map-zoom-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.map-zoom-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: white;
+  color: #0f172a;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.map-zoom-btn:last-child {
+  border-bottom: none;
+}
+
+.map-zoom-btn:hover {
+  background: #f1f5f9;
+}
+
+/* ===== Country info popup (replaces Leaflet's built-in popup) ===== */
+#country-popup {
+  display: none;
+  position: absolute;
+  /* --popup-offset shifts the box horizontally to stay on-screen near a viewport
+     edge (set from JS); the arrow below is counter-shifted to keep pointing at
+     the actual anchor. */
+  transform: translate(calc(-50% + var(--popup-offset, 0px)), calc(-100% - 14px));
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 950;
+  max-width: 220px;
+  pointer-events: none;
+}
+
+#country-popup.visible {
+  display: block;
+  pointer-events: auto;
+}
+
+#country-popup::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: calc(50% - var(--popup-offset, 0px));
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white;
 }
 
 #chat-panel {
