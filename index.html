@@ -65,10 +65,18 @@
     </a>
 
     <!-- Floating chat button -->
-    <button id="chat-toggle" style="position:fixed; bottom:20px; right:20px; 
-          background:#2563eb; color:white; border:none; border-radius:50%; 
-          width:60px; height:60px; font-size:28px; cursor:pointer; z-index:1000;">
-      💬
+    <button id="chat-toggle" aria-label="Open chat assistant">
+      <span class="chat-toggle-icon chat-icon-chat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      </span>
+      <span class="chat-toggle-icon chat-icon-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </span>
     </button>
 
     <!-- Chat panel (hidden by default) -->
@@ -119,7 +127,10 @@
       // Toggle panel
       toggleBtn.addEventListener('click', () => {
         panel.classList.toggle('open');
-        panel.style.display = panel.classList.contains('open') ? 'flex' : 'none';
+        const isOpen = panel.classList.contains('open');
+        panel.style.display = isOpen ? 'flex' : 'none';
+        toggleBtn.classList.toggle('open', isOpen);
+        toggleBtn.setAttribute('aria-label', isOpen ? 'Close chat assistant' : 'Open chat assistant');
       });
 
       // Send message
