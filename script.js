@@ -118,8 +118,11 @@ function hidePopup() {
   activePopupCentroid = null;
 }
 
-// GeoJSON source
-const geoJsonUrl = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
+// GeoJSON source — a locally-hosted, simplified copy of datasets/geo-countries
+// (Natural Earth derived), which unlike the previous johan/world.geo.json source
+// includes every sovereign micro-state (Cape Verde, Vatican, Tuvalu, etc.) and
+// carries real ISO 3166-1 codes per feature.
+const geoJsonUrl = 'data/countries.geojson';
 
 // Helper: format population with commas
 function formatPopulation(pop) {
@@ -186,7 +189,7 @@ function renderCountries(data) {
 
       const props = feature.properties;
       let countryName = props.name;
-      let isoCode = props.iso_a3;
+      let isoCode = props['ISO3166-1-Alpha-3'];
 
       // ---- Override for Israel → Palestine ----
       if (countryName === 'Israel' || isoCode === 'ISR') {
