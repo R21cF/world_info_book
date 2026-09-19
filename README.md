@@ -26,15 +26,17 @@ An interactive, AI‑powered world map that lets you explore country data at a g
 
 ## ✨ Features
 
-- **Interactive world map** – pan, zoom, and click any country.
-- **Detailed country popups** – show flag, capital, continent, and population (formatted with commas).
+- **Interactive world map** – pan, zoom (mouse, trackpad, or touch), and click any country.
+- **Equal Earth projection** – renders country borders as vector shapes with d3-geo instead of a Mercator‑projected raster basemap, so landmass sizes stay proportionally accurate (no more Greenland‑sized‑as‑Africa distortion).
+- **258 countries and territories** – including small island nations and micro‑states (Cape Verde, Vatican City, Tuvalu, etc.) that many world‑map datasets leave out.
+- **Detailed country popups** – show flag, capital, continent, and population (formatted with commas); stay anchored to the country as you pan/zoom, and clamp to the screen edge on narrow viewports.
 - **Britannica integration** – “More info” link searches Britannica for the country.
 - **AI chatbot assistant** – ask questions about any country; get real‑time, streaming answers.
 - **Glass‑morphism UI** – a sleek, translucent title badge and responsive design.
 - **Chat tooltip** – gentle onboarding for first‑time users (auto‑fades after 5 seconds).
 - **Globe favicon** – a simple emoji‑based icon for your browser tab.
-- **Full‑screen, immersive map** – with Leaflet and OpenStreetMap tiles.
-- **Responsive design** – works beautifully on desktop, tablet, and mobile.
+- **Full‑screen, immersive map** – rendered entirely in SVG with [D3.js](https://d3js.org/), no basemap tile imagery.
+- **Responsive design** – works on desktop, tablet, and mobile, with proper touch support for pan/pinch‑zoom.
 
 ---
 
@@ -61,12 +63,12 @@ You are a helpful country facts assistant. Respond in clear, plain text. Do not 
 
 | Category | Technology |
 |----------|------------|
-| **Map** | [Leaflet](https://leafletjs.com/) + [OpenStreetMap](https://www.openstreetmap.org/) tiles |
+| **Map** | [D3.js](https://d3js.org/) (`d3-geo` + `d3-zoom`) – vector SVG rendering with an Equal Earth projection |
 | **Country Data** | [REST Countries API v5](https://restcountries.com/) |
 | **AI Chat** | [Groq](https://groq.com/) (model: `openai/gpt-oss-120b`) |
 | **Hosting & Serverless** | [Vercel](https://vercel.com/) |
 | **Fonts** | System UI stack (no external fonts) |
-| **GeoJSON Data** | [johan/world.geo.json](https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json) |
+| **GeoJSON Data** | Locally‑hosted, [mapshaper](https://mapshaper.org/)‑simplified copy of [datasets/geo-countries](https://github.com/datasets/geo-countries) (Natural Earth derived, 258 features) — see `data/countries.geojson` |
 | **Favicon** | Emoji‑based SVG data URI |
 | **Version Control** | Git + GitHub |
 
@@ -140,7 +142,9 @@ Make sure to add your environment variables in the Vercel dashboard:
 world-info-book/
 ├── index.html          # Main HTML + inline styles/scripts
 ├── style.css           # Global and map styles
-├── script.js           # Map logic, popups, and chat UI
+├── script.js           # D3 map (Equal Earth projection), popups, and chat UI
+├── data/
+│   └── countries.geojson  # Locally-hosted country outlines (258 features)
 ├── api/
 │   ├── chat.js         # AI chatbot endpoint (Groq)
 │   └── countries.js    # Country data proxy (REST Countries v5)
@@ -153,8 +157,8 @@ world-info-book/
 
 ## 🙌 Acknowledgements
 
-- [Leaflet](https://leafletjs.com/) for the mapping library.
-- [OpenStreetMap](https://www.openstreetmap.org/) for the tile layers.
+- [D3.js](https://d3js.org/) for the mapping and projection library.
+- [datasets/geo-countries](https://github.com/datasets/geo-countries) and [Natural Earth](https://www.naturalearthdata.com/) for the country outline data.
 - [REST Countries](https://restcountries.com/) for the country data API.
 - [Groq](https://groq.com/) for the fast AI inference.
 - [Vercel](https://vercel.com/) for seamless hosting and serverless functions.
