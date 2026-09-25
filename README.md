@@ -177,4 +177,4 @@ Contributions are welcome! If you find a bug or want to suggest an improvement, 
 
 ---
 
-**Built with curiosity and a love for exploration.** 🌍
+**Built with curiosity.** 🌍
