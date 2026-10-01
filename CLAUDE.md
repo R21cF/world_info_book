@@ -4,13 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-World Info Book: a full-screen interactive world map (vanilla HTML/CSS/JS + D3) where clicking a country shows a popup with flag/capital/continent/population, plus a streaming AI chat panel. Deployed on Vercel (live at https://world-info-book.vercel.app). There is no `package.json`, build step, linter, or test suite: it's static files plus two Vercel serverless functions.
+World Info Book: a full-screen interactive world map (vanilla HTML/CSS/JS + D3) where clicking a country shows a popup with flag/capital/continent/population, plus a streaming AI chat panel. Deployed on Vercel (live at https://world-info-book.vercel.app). The website has no build step, linter, or test suite: Vercel serves the static files from the repo root plus two serverless functions. The same files are also packaged as an Android app with Capacitor. `package.json` exists only for that tooling, and it deliberately has no `build` script, so Vercel keeps serving the root as-is.
 
 ## Commands
 
 - `vercel dev`: run locally at http://localhost:3000 (serves static files plus `api/*`). Needs `REST_COUNTRIES_KEY` and `GROQ_API_KEY` in `.env`.
 - `vercel --prod`: deploy. Production env vars are set in the Vercel dashboard, not read from `.env`.
 - Use `vercel dev`; don't open `index.html` directly. Over `file://`, the ES modules and GeoJSON fetch are blocked. A plain static server renders the map, but popups and chat fail because `/api/*` won't exist.
+- Android app (needs Android Studio, which this machine doesn't have installed as of 2026-10-01):
+  - `npm run android:sync` copies the site into `www/` (via `scripts/build-web.mjs`) and then into `android/` (`cap sync`).
+  - `npm run android:open` opens Android Studio.
+  - `npm run android:bundle` builds the signed release `.aab`. It needs `JAVA_HOME` and `android/keystore.properties`.
+  - See the README's Android section for signing and publishing.
 
 ## Architecture
 
@@ -25,6 +30,15 @@ World Info Book: a full-screen interactive world map (vanilla HTML/CSS/JS + D3) 
   - `resize()` refits the projection to `{type:'Sphere'}`, rebuilds paths, resets the zoom, and closes the popup.
   - `normalizeWinding()` rewrites polygon ring winding before rendering. d3-geo requires clockwise exteriors; mis-wound rings make d3's antimeridian clipping produce a huge invisible shape that steals clicks from other countries. Keep this step if you swap the data source.
   - Country lookups are cached in memory per session. A stale response (the user clicked another country first) is dropped via `popupRequestId`.
+- **Android app (Capacitor 8, app ID `io.github.r21cf.worldinfobook`)** wraps the same frontend; there's no separate app code. The things that differ:
+  - `js/config.js` detects the native app (`window.Capacitor.isNativePlatform()`). It then sets `API_BASE` to the production URL, because bundled pages are served from `https://localhost` on the device. Every API call must use `API_BASE`.
+  - `api/_cors.js` allows the app's origins (`https://localhost`, plus `capacitor://localhost` for a future iOS app) for cross-origin calls. The `_` prefix keeps Vercel from deploying it as an endpoint. New API endpoints must call `handleCors` too.
+  - API changes reach the app on deploy. Frontend changes need `npm run android:sync` plus a new release with a bumped `versionCode` in `android/app/build.gradle`.
+  - When adding a top-level file the page needs, also add it to `FILES` in `scripts/build-web.mjs`.
+  - Fixed-position UI is offset by `--safe-top/right/bottom/left` (in `style.css`), because Android draws edge-to-edge. These are zero in desktop browsers.
+  - There's deliberately no PWA (manifest or service worker). The user chose the Play Store app over an installable website.
+  - Icons and splash screens in `android/app/src/main/res/`, and the Play listing icon in `android/store/`, were generated from the Twemoji globe; `@capacitor/assets` isn't used, because its `sharp` install script is blocked by the user's npm `allow-scripts` policy.
+  - `.vercelignore` keeps `android/`, `www/`, `node_modules/`, and `scripts/` out of website deploys.
 - Glassmorphism `backdrop-filter` is disabled on touch devices (`@media (hover: none)`), because re-blurring the map behind the badges every frame is expensive.
 - Country outlines come from `data/countries.geojson`: a local copy of datasets/geo-countries (258 features), simplified with mapshaper, with coordinates rounded to 2 decimals. Tiny rings keep higher precision so micro-states don't collapse. Feature properties used: `name` and `ISO3166-1-Alpha-3`. `-99` means there's no ISO code, so the name is used for the lookup instead.
 - Click handler overrides: Israel → Palestine (`PSE`) and Taiwan → China (`CHN`) are remapped before the data lookup. The chat system prompt in `api/chat.js` follows a matching policy. These are intentional product decisions.

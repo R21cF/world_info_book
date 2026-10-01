@@ -7,6 +7,8 @@
 // which was very sluggish on phones. On canvas, each country's outline is projected
 // once into a cached Path2D, and a frame is just "set transform, fill, stroke".
 
+import { API_BASE } from './config.js';
+
 const GEOJSON_URL = 'data/countries.geojson';
 const MAX_ZOOM = 8;
 const ZOOM_STEP = 1.6;
@@ -265,7 +267,7 @@ function fetchCountry(name, isoCode) {
 }
 
 async function requestCountry(query, name) {
-  const response = await fetch(`/api/countries?${query}`);
+  const response = await fetch(`${API_BASE}/api/countries?${query}`);
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error || `HTTP ${response.status}`);

@@ -1,12 +1,16 @@
 // Proxies REST Countries API v5 lookups, adding the API key server-side.
 // Query: ?isoCode=<alpha-2|alpha-3>  or  ?countryName=<name>
 
+import { handleCors } from './_cors.js';
+
 const API_BASE = 'https://api.restcountries.com/countries/v5';
 
 // Country facts rarely change, so let Vercel's edge cache serve repeat lookups.
 const CACHE_CONTROL = 'public, s-maxage=86400, stale-while-revalidate=604800';
 
 export default async function handler(req, res) {
+  if (handleCors(req, res, 'GET')) return;
+
   const { isoCode, countryName } = req.query;
   if (!isoCode && !countryName) {
     return res.status(400).json({ error: 'Missing isoCode or countryName' });

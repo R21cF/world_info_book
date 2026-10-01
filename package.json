@@ -1,0 +1,17 @@
+{
+  "name": "world-info-book",
+  "private": true,
+  "description": "Interactive world map with country facts and an AI assistant.",
+  "license": "MIT",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs",
+    "android:sync": "npm run build:web && cap sync android",
+    "android:open": "cap open android",
+    "android:bundle": "npm run android:sync && cd android && gradlew bundleRelease"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  }
+}

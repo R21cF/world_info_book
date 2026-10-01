@@ -1,3 +1,14 @@
+/* Device safe areas (notches, status/navigation bars), so floating controls aren't
+   hidden under them in the Android app. Zero in regular desktop browsers.
+   The --safe-area-inset-* variables are what Capacitor provides on Android WebViews
+   that don't report env() insets. */
+:root {
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -39,8 +50,8 @@ body {
 /* ===== Map zoom controls (top-right) ===== */
 #map-zoom-controls {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: calc(20px + var(--safe-top));
+  right: calc(20px + var(--safe-right));
   z-index: 900;
   display: flex;
   flex-direction: column;
@@ -139,7 +150,7 @@ body {
 /* ===== Floating badges (title top-left, GitHub link bottom-left) ===== */
 .glass {
   position: fixed;
-  left: 20px;
+  left: calc(20px + var(--safe-left));
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -162,7 +173,7 @@ body {
 }
 
 #app-title {
-  top: 20px;
+  top: calc(20px + var(--safe-top));
   gap: 8px;
   padding: 10px 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -173,7 +184,7 @@ body {
 }
 
 #github-link {
-  bottom: 20px;
+  bottom: calc(20px + var(--safe-bottom));
   gap: 6px;
   padding: 8px 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
@@ -198,8 +209,8 @@ body {
 /* ===== Chat tooltip ===== */
 #chat-tooltip {
   position: fixed;
-  bottom: 90px;
-  right: 20px;
+  bottom: calc(90px + var(--safe-bottom));
+  right: calc(20px + var(--safe-right));
   z-index: 999;
   max-width: 220px;
   padding: 12px 16px;
@@ -229,8 +240,8 @@ body {
 /* ===== Floating chat toggle button ===== */
 #chat-toggle {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: calc(20px + var(--safe-bottom));
+  right: calc(20px + var(--safe-right));
   z-index: 1000;
   width: 60px;
   height: 60px;
@@ -301,8 +312,8 @@ body {
 #chat-panel {
   display: none;
   position: fixed;
-  bottom: 90px;
-  right: 20px;
+  bottom: calc(90px + var(--safe-bottom));
+  right: calc(20px + var(--safe-right));
   z-index: 1000;
   width: 350px;
   max-width: calc(100vw - 32px);
@@ -378,17 +389,17 @@ body {
 /* ===== Small screens ===== */
 @media (max-width: 640px) {
   .glass {
-    left: 14px;
+    left: calc(14px + var(--safe-left));
   }
 
   #app-title {
-    top: 14px;
+    top: calc(14px + var(--safe-top));
     padding: 6px 14px;
     font-size: 1rem;
   }
 
   #github-link {
-    bottom: 14px;
+    bottom: calc(14px + var(--safe-bottom));
     padding: 6px 12px;
     font-size: 0.75rem;
   }
@@ -396,8 +407,8 @@ body {
   #chat-toggle {
     width: 54px;
     height: 54px;
-    bottom: 16px;
-    right: 16px;
+    bottom: calc(16px + var(--safe-bottom));
+    right: calc(16px + var(--safe-right));
   }
 
   .chat-toggle-icon {
@@ -406,7 +417,7 @@ body {
   }
 
   #chat-panel {
-    right: 16px;
+    right: calc(16px + var(--safe-right));
   }
 
   #chat-input {

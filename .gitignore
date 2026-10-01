@@ -3,3 +3,5 @@
 .env
 about.txt
 .env*
+node_modules/
+www/

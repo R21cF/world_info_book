@@ -37,6 +37,7 @@ An interactive, AI‑powered world map that lets you explore country data at a g
 - **Globe favicon** – a simple emoji‑based icon for your browser tab.
 - **Full‑screen, immersive map** – drawn on a `<canvas>` with [D3.js](https://d3js.org/), no basemap tile imagery, so panning and pinch‑zooming stay smooth on phones.
 - **Responsive design** – works on desktop, tablet, and mobile, with proper touch support for pan/pinch‑zoom.
+- **Android app** – the same app is packaged for the Google Play Store (see [Android App](#-android-app-google-play) below); the website stays available as before.
 
 ---
 
@@ -136,6 +137,46 @@ Make sure to add your environment variables in the Vercel dashboard:
 
 ---
 
+## 🤖 Android App (Google Play)
+
+The same web app is also packaged as a native Android app with [Capacitor](https://capacitorjs.com/). The app bundles the map files, so it opens instantly, and it calls the deployed API at `https://world-info-book.vercel.app` for country data and chat. The website keeps working exactly as before.
+
+**App ID:** `io.github.r21cf.worldinfobook` (set in `capacitor.config.json` and `android/app/build.gradle`). It can't be changed after the first Play Store upload.
+
+### One-time setup
+1. Install [Android Studio](https://developer.android.com/studio). It includes the Android SDK and the Java runtime the build needs.
+2. Install the Capacitor tooling (from the project root):
+   ```bash
+   npm install
+   ```
+3. Create your **upload key** (keep the file and passwords safe and backed up; never commit them):
+   ```bash
+   "C:\Program Files\Android\Android Studio\jbr\bin\keytool" -genkeypair -v -keystore android/upload-keystore.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
+   ```
+4. Copy `android/keystore.properties.example` to `android/keystore.properties` and fill in the passwords you just chose.
+5. Deploy the website (`vercel --prod`) so the live API includes the CORS headers the app needs.
+
+### Build the Play Store bundle (.aab)
+```bash
+npm run android:sync     # copy the latest web files into the Android project
+npm run android:open     # open it in Android Studio
+```
+In Android Studio:
+- **Test:** plug in a phone with USB debugging enabled (or create an emulator) and press ▶ Run.
+- **Release build:** run *Build → Generate Signed App Bundle / APK → Android App Bundle*. You can also run `npm run android:bundle` from a terminal where `JAVA_HOME` points to Android Studio's `jbr` folder.
+- The bundle is written to `android/app/build/outputs/bundle/release/app-release.aab`.
+
+### Publishing
+1. Create a [Google Play Console](https://play.google.com/console) developer account (one-time $25 fee).
+2. Create the app, then upload the `.aab` to a testing track first. New personal developer accounts must run a closed test before releasing to everyone; the Play Console shows the current requirements.
+3. Fill in the store listing (use `android/store/play-icon-512.png` as the app icon, plus phone screenshots), the content rating questionnaire, and the **Data safety** form. Questions typed into the chat are sent to Groq to generate answers, and the store listing needs a privacy policy URL.
+
+### Updating the app
+- **API changes** (`api/`) go live for the app as soon as you deploy the website.
+- **Map/UI changes** (HTML, CSS, JS, data) are bundled inside the app, so they need a new release. Bump `versionCode` (by 1) and `versionName` in `android/app/build.gradle`, run `npm run android:sync`, and build and upload a new bundle.
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -144,14 +185,22 @@ world-info-book/
 ├── style.css           # All styles
 ├── js/
 │   ├── map.js          # Canvas map (Equal Earth projection), zoom, and country popups
-│   └── chat.js         # Chat panel UI (streams replies from /api/chat)
+│   ├── chat.js         # Chat panel UI (streams replies from /api/chat)
+│   └── config.js       # API base URL (same-origin on the web, live site in the app)
 ├── vendor/
 │   └── d3.min.js       # Trimmed D3 bundle (only the modules the map needs)
 ├── data/
 │   └── countries.geojson  # Locally-hosted country outlines (258 features)
 ├── api/
 │   ├── chat.js         # AI chatbot endpoint (Groq)
-│   └── countries.js    # Country data proxy (REST Countries v5)
+│   ├── countries.js    # Country data proxy (REST Countries v5)
+│   └── _cors.js        # CORS helper so the Android app can call the API
+├── android/            # Native Android project (Capacitor)
+│   └── store/          # Play Store listing assets (512px icon)
+├── capacitor.config.json # App ID, name, and web folder for Capacitor
+├── package.json        # Capacitor tooling + Android build scripts
+├── scripts/
+│   └── build-web.mjs   # Copies the site into www/ for the app build
 ├── .env                # Environment variables (ignored by Git)
 ├── .env.local          # Ignored by Git as well
 └── .gitignore          # For telling Git to ignore files
@@ -162,6 +211,7 @@ world-info-book/
 ## 🙌 Acknowledgements
 
 - [D3.js](https://d3js.org/) for the mapping and projection library.
+- [Twemoji](https://github.com/jdecked/twemoji) for the globe used in the Android app icon and splash screen (CC-BY 4.0).
 - [datasets/geo-countries](https://github.com/datasets/geo-countries) and [Natural Earth](https://www.naturalearthdata.com/) for the country outline data.
 - [REST Countries](https://restcountries.com/) for the country data API.
 - [Groq](https://groq.com/) for the fast AI inference.

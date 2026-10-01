@@ -2,6 +2,8 @@
 // Sends one question at a time to /api/chat and renders the streamed reply, which
 // arrives as SSE lines: `data: {"text": "..."}` chunks, then `data: {"done": true}`.
 
+import { API_BASE } from './config.js';
+
 const TOOLTIP_DURATION_MS = 5000;
 
 const toggleBtn = document.getElementById('chat-toggle');
@@ -56,7 +58,7 @@ async function sendMessage(text) {
 
   let reply = '';
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch(`${API_BASE}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text }),

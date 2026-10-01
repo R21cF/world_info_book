@@ -1,0 +1,8 @@
+{
+  "appId": "io.github.r21cf.worldinfobook",
+  "appName": "World Info Book",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#aad3df"
+  }
+}
