@@ -49,15 +49,7 @@ World Info Book: a full-screen interactive world map (vanilla HTML/CSS/JS + D3) 
 
 ## Commits
 
-The repo owner wants Claude credited as the **author** of commits Claude makes, with the owner as co-author. Pass the author explicitly on each commit, and don't change `git config`, because the owner's own commits must stay authored by them:
-
-```
-git commit --author="Claude <noreply@anthropic.com>" -m "<message>
-
-Co-Authored-By: R21cF <80525901+R21cF@users.noreply.github.com>"
-```
-
-Don't rewrite already-pushed commits to change their authorship.
+Commits use the owner's normal git identity (`R21cF`). Don't pass `--author`, and don't add `Co-Authored-By` trailers for Claude or bots. The owner wants only themselves in GitHub's Contributors list, and history was rewritten on 2026-10-01 to remove Claude and vercel[bot] as authors.
 
 ## Notes
 
