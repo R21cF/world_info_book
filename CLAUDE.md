@@ -47,6 +47,18 @@ World Info Book: a full-screen interactive world map (vanilla HTML/CSS/JS + D3) 
 - `api/countries.js` is a proxy to REST Countries **v5** (`api.restcountries.com/countries/v5/...`) that adds the bearer key server-side. It looks up by ISO code (2- or 3-letter, chosen by length), or by `names.common` with `fullText=true` and a fallback to `names.official`. It returns 404 when nothing matches. Successful responses send `Cache-Control: s-maxage=86400` so Vercel's edge caches them. The frontend expects the v5 response shape `data.objects[0]` with `names.common`, `capitals[0].name`, `continents[0]`, `population`, and `flag.url_png`/`url_svg`.
 - `api/chat.js` takes POST `{message}` (max 2000 chars) and sends a single-turn request (no conversation history) to Groq's OpenAI-compatible endpoint, model `openai/gpt-oss-120b`, with `stream: true`. It re-emits deltas to the client as SSE lines `data: {"text": ...}` and ends with `data: {"done": true}`. `js/chat.js` parses exactly this format, so change both together. The system prompt asks for plain text with no Markdown, because the client renders the reply as escaped text.
 
+## Commits
+
+The repo owner wants Claude credited as the **author** of commits Claude makes, with the owner as co-author. Pass the author explicitly on each commit, and don't change `git config`, because the owner's own commits must stay authored by them:
+
+```
+git commit --author="Claude <noreply@anthropic.com>" -m "<message>
+
+Co-Authored-By: R21cF <80525901+R21cF@users.noreply.github.com>"
+```
+
+Don't rewrite already-pushed commits to change their authorship.
+
 ## Notes
 
 - `.env`, `.env.local`, `.vercel`, and `about.txt` are gitignored.
