@@ -144,7 +144,8 @@ The same web app is also packaged as a native Android app with [Capacitor](https
 **App ID:** `io.github.r21cf.worldinfobook` (set in `capacitor.config.json` and `android/app/build.gradle`). It can't be changed after the first Play Store upload.
 
 ### One-time setup
-1. Install [Android Studio](https://developer.android.com/studio). It includes the Android SDK and the Java runtime the build needs.
+1. Install [Android Studio](https://developer.android.com/studio) and the Android SDK (Platform 36, Build-Tools 35, Platform-Tools).
+   - The build also needs **JDK 21**. Android Studio 2026.1 bundles Java 25, which the project's Gradle version can't run on. `android/gradle/gradle-daemon-jvm.properties` makes Gradle pick an installed JDK 21 automatically. The easiest place to put one is `%USERPROFILE%\.jdks` (Android Studio: *Settings → Build Tools → Gradle → Gradle JDK → Download JDK → version 21*).
 2. Install the Capacitor tooling (from the project root):
    ```bash
    npm install

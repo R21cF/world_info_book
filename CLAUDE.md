@@ -11,7 +11,7 @@ World Info Book: a full-screen interactive world map (vanilla HTML/CSS/JS + D3) 
 - `vercel dev`: run locally at http://localhost:3000 (serves static files plus `api/*`). Needs `REST_COUNTRIES_KEY` and `GROQ_API_KEY` in `.env`.
 - `vercel --prod`: deploy. Production env vars are set in the Vercel dashboard, not read from `.env`.
 - Use `vercel dev`; don't open `index.html` directly. Over `file://`, the ES modules and GeoJSON fetch are blocked. A plain static server renders the map, but popups and chat fail because `/api/*` won't exist.
-- Android app (needs Android Studio, which this machine doesn't have installed as of 2026-10-01):
+- Android app (Android Studio, the SDK at `%LOCALAPPDATA%\Android\Sdk`, and JDK 21 in `~/.jdks` are installed on this machine as of 2026-10-01). The Gradle daemon must run on JDK 21 (`android/gradle/gradle-daemon-jvm.properties`), because Gradle 8.14 fails on Android Studio's bundled Java 25 with "Unsupported class file major version 69". From a shell, set `JAVA_HOME` to any JDK (e.g. Android Studio's `jbr`) and Gradle picks JDK 21 for the daemon:
   - `npm run android:sync` copies the site into `www/` (via `scripts/build-web.mjs`) and then into `android/` (`cap sync`).
   - `npm run android:open` opens Android Studio.
   - `npm run android:bundle` builds the signed release `.aab`. It needs `JAVA_HOME` and `android/keystore.properties`.
