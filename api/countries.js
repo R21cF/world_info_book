@@ -1,71 +1,59 @@
-// file: api/countries.js
+// Proxies REST Countries API v5 lookups, adding the API key server-side.
+// Query: ?isoCode=<alpha-2|alpha-3>  or  ?countryName=<name>
+
+const API_BASE = 'https://api.restcountries.com/countries/v5';
+
+// Country facts rarely change, so let Vercel's edge cache serve repeat lookups.
+const CACHE_CONTROL = 'public, s-maxage=86400, stale-while-revalidate=604800';
+
 export default async function handler(req, res) {
-  console.log('📥 Request received:', req.query);
-
   const { isoCode, countryName } = req.query;
-
   if (!isoCode && !countryName) {
     return res.status(400).json({ error: 'Missing isoCode or countryName' });
   }
 
-  // Log the environment variable to see if it's loaded
-  const API_KEY = process.env.REST_COUNTRIES_KEY;
-  console.log('🔑 API_KEY present?', !!API_KEY);
-
-  if (!API_KEY) {
-    console.error('❌ REST_COUNTRIES_KEY is not set');
+  const apiKey = process.env.REST_COUNTRIES_KEY;
+  if (!apiKey) {
+    console.error('REST_COUNTRIES_KEY is not set');
     return res.status(500).json({ error: 'Server configuration error: missing API key' });
   }
 
-  async function fetchFromApi(url) {
-    console.log('🌐 Fetching URL:', url);
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`
-      }
-    });
-    console.log('📡 External API status:', response.status);
-    return response;
-  }
-
   try {
-    let response;
-
-    if (isoCode && isoCode !== '-99') {
-      // codes.alpha_3 expects a 3-letter code, codes.alpha_2 expects a 2-letter code.
-      const codeProperty = isoCode.length === 2 ? 'codes.alpha_2' : 'codes.alpha_3';
-      response = await fetchFromApi(`https://api.restcountries.com/countries/v5/${codeProperty}/${isoCode}`);
-    } else {
-      response = await fetchFromApi(`https://api.restcountries.com/countries/v5/names.common/${encodeURIComponent(countryName)}?fullText=true`);
-
-      // Some GeoJSON sources use a country's long/official name (e.g. "United States
-      // of America"), which won't exact-match names.common ("United States"). Retry
-      // against names.official before giving up.
-      if (response.ok) {
-        const commonData = await response.json();
-        if (!commonData.data?.objects || commonData.data.objects.length === 0) {
-          response = await fetchFromApi(`https://api.restcountries.com/countries/v5/names.official/${encodeURIComponent(countryName)}?fullText=true`);
-        } else {
-          return res.status(200).json(commonData);
-        }
-      }
-    }
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ External API error:', response.status, errorText);
-      return res.status(response.status).json({
-        error: `External API error: ${response.status}`,
-        details: errorText
+    let data;
+    for (const path of lookupPaths(isoCode, countryName)) {
+      const response = await fetch(`${API_BASE}/${path}`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
       });
+      // A 404 just means "no match here"; try the next lookup.
+      if (response.status === 404) continue;
+      if (!response.ok) {
+        const details = await response.text();
+        console.error('REST Countries error:', response.status, details);
+        return res.status(response.status).json({ error: `External API error: ${response.status}`, details });
+      }
+      data = await response.json();
+      if (data.data?.objects?.length) break;
     }
 
-    const data = await response.json();
-    console.log('✅ Data received, objects count:', data.data?.objects?.length || 0);
-
+    if (!data?.data?.objects?.length) {
+      return res.status(404).json({ error: `No country data found for ${countryName || isoCode}` });
+    }
+    res.setHeader('Cache-Control', CACHE_CONTROL);
     res.status(200).json(data);
   } catch (error) {
-    console.error('💥 Proxy error:', error.message);
+    console.error('Proxy error:', error);
     res.status(500).json({ error: `Failed to fetch country data: ${error.message}` });
   }
+}
+
+// Lookups to try in order. Some GeoJSON features carry a long/official name (e.g.
+// "United States of America") that won't exact-match names.common, so a name
+// lookup falls back to names.official. '-99' is the GeoJSON's "no ISO code" marker.
+function lookupPaths(isoCode, countryName) {
+  if (isoCode && isoCode !== '-99') {
+    const field = isoCode.length === 2 ? 'codes.alpha_2' : 'codes.alpha_3';
+    return [`${field}/${encodeURIComponent(isoCode)}`];
+  }
+  const name = encodeURIComponent(countryName);
+  return [`names.common/${name}?fullText=true`, `names.official/${name}?fullText=true`];
 }

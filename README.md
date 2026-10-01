@@ -35,7 +35,7 @@ An interactive, AI‑powered world map that lets you explore country data at a g
 - **Glass‑morphism UI** – a sleek, translucent title badge and responsive design.
 - **Chat tooltip** – gentle onboarding for first‑time users (auto‑fades after 5 seconds).
 - **Globe favicon** – a simple emoji‑based icon for your browser tab.
-- **Full‑screen, immersive map** – rendered entirely in SVG with [D3.js](https://d3js.org/), no basemap tile imagery.
+- **Full‑screen, immersive map** – drawn on a `<canvas>` with [D3.js](https://d3js.org/), no basemap tile imagery, so panning and pinch‑zooming stay smooth on phones.
 - **Responsive design** – works on desktop, tablet, and mobile, with proper touch support for pan/pinch‑zoom.
 
 ---
@@ -63,7 +63,7 @@ You are a helpful country facts assistant. Respond in clear, plain text. Do not 
 
 | Category | Technology |
 |----------|------------|
-| **Map** | [D3.js](https://d3js.org/) (`d3-geo` + `d3-zoom`) – vector SVG rendering with an Equal Earth projection |
+| **Map** | [D3.js](https://d3js.org/) (`d3-geo` + `d3-zoom`) – canvas rendering with an Equal Earth projection (trimmed D3 bundle served locally from `vendor/d3.min.js`) |
 | **Country Data** | [REST Countries API v5](https://restcountries.com/) |
 | **AI Chat** | [Groq](https://groq.com/) (model: `openai/gpt-oss-120b`) |
 | **Hosting & Serverless** | [Vercel](https://vercel.com/) |
@@ -140,9 +140,13 @@ Make sure to add your environment variables in the Vercel dashboard:
 
 ```
 world-info-book/
-├── index.html          # Main HTML + inline styles/scripts
-├── style.css           # Global and map styles
-├── script.js           # D3 map (Equal Earth projection), popups, and chat UI
+├── index.html          # Page markup
+├── style.css           # All styles
+├── js/
+│   ├── map.js          # Canvas map (Equal Earth projection), zoom, and country popups
+│   └── chat.js         # Chat panel UI (streams replies from /api/chat)
+├── vendor/
+│   └── d3.min.js       # Trimmed D3 bundle (only the modules the map needs)
 ├── data/
 │   └── countries.geojson  # Locally-hosted country outlines (258 features)
 ├── api/
