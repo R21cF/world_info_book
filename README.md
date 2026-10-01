@@ -181,4 +181,4 @@ Contributions are welcome! If you find a bug or want to suggest an improvement, 
 
 ---
 
-**Built with curiosity.** 🌍
+**Built with curiosity** 🌍
